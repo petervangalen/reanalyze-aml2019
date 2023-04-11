@@ -15,6 +15,7 @@ cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], c
 aml <- readRDS("Seurat_AML.rds")
 
 # Add gene expression as metadata
+mygene <- "HOXA9"
 mygene <- "HAVCR2"
 mygene <- "LGALS9"
 mygene <- "CEACAM1"
