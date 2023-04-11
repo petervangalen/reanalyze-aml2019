@@ -69,4 +69,4 @@ pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
 plot_grid(p1, p2, ncol = 1)
 dev.off()
 
-# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red). The sina/violin plots show expression in every individual cell (symbol). Note that the scale is different between pages.
+# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red). The sina/violin plots show expression in every individual cell (symbol).
