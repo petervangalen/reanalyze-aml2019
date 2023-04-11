@@ -23,7 +23,8 @@ mygene <- "HAVCR2"
 mygene <- "LGALS9"
 mygene <- "CEACAM1"
 mygene <- "HMGB1"
-metadata$mygene <- GetAssayData(aml, slot = "data")[mygene,]
+# The following has changes with Seurat version 5. Update if you get an error.
+metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
 
 # Filter out "normal" cells from AML patients since their gene expression may be aberrant
 metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
@@ -48,8 +49,8 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
 
- #Visualize the plot 
-  plot(p1)  
+# Visualize the plot 
+plot(p1)  
                                        
 # The sina/violin plot shows expression in every individual cell (symbol)
 p2 <- metadata.filter %>%
@@ -70,8 +71,8 @@ p2 <- metadata.filter %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
                                        
- #Visualize the plot 
-  plot(p2) 
+# Visualize the plot 
+plot(p2) 
                                        
 # Save pdf
 pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
