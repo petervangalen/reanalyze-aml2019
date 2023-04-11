@@ -48,6 +48,9 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
 
+ #Visualize the plot 
+  plot(p1)  
+                                       
 # The sina/violin plot shows expression in every individual cell (symbol)
 p2 <- metadata.filter %>%
   ggplot(aes(x = CellType, y = mygene, color = Donor)) +
@@ -66,7 +69,10 @@ p2 <- metadata.filter %>%
         legend.title = element_text(size = 12),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
-
+                                       
+ #Visualize the plot 
+  plot(p2) 
+                                       
 # Save pdf
 pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
 plot_grid(p1, p2, ncol = 1)
