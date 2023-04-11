@@ -1,33 +1,36 @@
 # Peter van Galen, 230411
-# Check expression of genes of interest in data from single-cell AML paper (van Galen et al, Cell 2019)
+# Check expression of genes of interest in data from single-cell AML paper (van Galen, Hovestadt et al, Cell 2019)
 
+# Load required libraries
 library(tidyverse)
 library(Seurat)
 library(ggforce)
 library(cowplot)
 
+# Start with a clean slate
 rm(list=ls())
 
 # Frequently used function
 cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], collapse=d))
 
-# Load AML paper data. Make sure to run 1_Download_Seurat_AML.sh first and be in the right directory
+# Load AML paper data. This first needs to be downloaded as described in README.md
 aml <- readRDS("Seurat_AML.rds")
 
-# Add gene expression as metadata
+# Generate a metadata tibble and add gene expression (choose one gene)
+metadata <- as_tibble(aml@meta.data, rownames = "cell")
 mygene <- "HOXA9"
 mygene <- "HAVCR2"
 mygene <- "LGALS9"
 mygene <- "CEACAM1"
 mygene <- "HMGB1"
-metadata <- as_tibble(aml@meta.data, rownames = "cell")
 metadata$mygene <- GetAssayData(aml, slot = "data")[mygene,]
 
-# Filter out "normal" cells from AML patients
+# Filter out "normal" cells from AML patients since their gene expression may be aberrant
 metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
   mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
   mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
 
+# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red)
 p1 <- metadata.filter %>% group_by(CellType) %>%
   summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor)) %>%
   ggplot(aes(x = CellType, y = mean_mygene, fill = Donor)) +
@@ -45,7 +48,7 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
 
-# Sina plot
+# The sina/violin plots show expression in every individual cell (symbol)
 p2 <- metadata.filter %>%
   ggplot(aes(x = CellType, y = mygene, color = Donor)) +
   geom_violin(scale = "width") +
@@ -64,9 +67,9 @@ p2 <- metadata.filter %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
 
-# Bar plot
+# Save pdf
 pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
 plot_grid(p1, p2, ncol = 1)
 dev.off()
 
-# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red). The sina/violin plots show expression in every individual cell (symbol).
+
