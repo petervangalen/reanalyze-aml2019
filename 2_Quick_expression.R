@@ -1,0 +1,71 @@
+# Peter van Galen, 230411
+# Check expression of genes of interest in data from single-cell AML paper (van Galen et al, Cell 2019)
+
+library(tidyverse)
+library(Seurat)
+library(ggforce)
+library(cowplot)
+
+rm(list=ls())
+
+# Frequently used function
+cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], collapse=d))
+
+# Load AML paper data. Make sure to run 1_Download_Seurat_AML.sh first and be in the right directory
+aml <- readRDS("Seurat_AML.rds")
+
+# Add gene expression as metadata
+mygene <- "HAVCR2"
+mygene <- "LGALS9"
+mygene <- "CEACAM1"
+mygene <- "HMGB1"
+metadata <- as_tibble(aml@meta.data, rownames = "cell")
+metadata$mygene <- GetAssayData(aml, slot = "data")[mygene,]
+
+# Filter out "normal" cells from AML patients
+metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
+  mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
+  mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
+
+p1 <- metadata.filter %>% group_by(CellType) %>%
+  summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor)) %>%
+  ggplot(aes(x = CellType, y = mean_mygene, fill = Donor)) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
+  ylab("Normalized expression") +
+  ggtitle(mygene) +
+  theme_bw() +
+  theme(aspect.ratio = 0.5,
+        axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 15, color = "black"),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15, color = "black"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 14, hjust = 0.5))
+
+# Sina plot
+p2 <- metadata.filter %>%
+  ggplot(aes(x = CellType, y = mygene, color = Donor)) +
+  geom_violin(scale = "width") +
+  geom_sina(scale = "width") +
+  ylab("Normalized expression") +
+  ggtitle(mygene) +
+  scale_x_discrete(drop = F) +
+  scale_color_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
+  theme_bw() +
+  theme(aspect.ratio = 0.5,
+        axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 15, color = "black"),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15, color = "black"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 14, hjust = 0.5))
+
+# Bar plot
+pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
+plot_grid(p1, p2, ncol = 1)
+dev.off()
+
+# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red). The sina/violin plots show expression in every individual cell (symbol). Note that the scale is different between pages.
