@@ -30,7 +30,7 @@ metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like",
   mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
   mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
 
-# The bar plots show the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red)
+# The bar plot shows the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red)
 p1 <- metadata.filter %>% group_by(CellType) %>%
   summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor)) %>%
   ggplot(aes(x = CellType, y = mean_mygene, fill = Donor)) +
@@ -48,7 +48,7 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
 
-# The sina/violin plots show expression in every individual cell (symbol)
+# The sina/violin plot shows expression in every individual cell (symbol)
 p2 <- metadata.filter %>%
   ggplot(aes(x = CellType, y = mygene, color = Donor)) +
   geom_violin(scale = "width") +
