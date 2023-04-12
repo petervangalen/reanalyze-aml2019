@@ -37,7 +37,7 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
   ggplot(aes(x = CellType, y = mean_mygene, fill = Donor)) +
   geom_bar(stat="identity") +
   scale_fill_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
-  ylab("Normalized expression") +
+  ylab("Mean normalized expression") +
   ggtitle(mygene) +
   theme_bw() +
   theme(aspect.ratio = 0.5,
@@ -57,7 +57,7 @@ p2 <- metadata.filter %>%
   ggplot(aes(x = CellType, y = mygene, color = Donor)) +
   geom_violin(scale = "width") +
   geom_sina(scale = "width") +
-  ylab("Normalized expression") +
+  ylab("Normalized expression,log(TP10K+1)") +
   ggtitle(mygene) +
   scale_x_discrete(drop = F) +
   scale_color_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
