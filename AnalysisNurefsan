@@ -57,6 +57,7 @@ new_order <- c("BM1", "BM2", "BM3", "BM4", "BM5.34p", "BM5.34p38n", "AML1012.D0"
  ggplot(aes(x = factor(orig.ident, new_order), y = mean_mygene, fill = FLT3)) +
   ylab("Mean Normalized expression") + 
 geom_bar(stat="identity") +
+scale_x_discrete(drop=F) +
 ggtitle(mygene) +
 theme_bw() +
 theme(aspect.ratio = 0.5, axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 10, color = "black"),
