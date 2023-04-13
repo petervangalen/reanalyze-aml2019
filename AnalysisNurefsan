@@ -51,7 +51,7 @@ metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like",
 
 new_order <- c("BM1", "BM2", "BM3", "BM4", "BM5.34p", "BM5.34p38n", "AML1012.D0","AML314.D0", "AML314.D31", "AML371.D0", "AML371.D34", "AML420B.D0", "AML420B.D14", "AML420B.D35", "AML475.D0", "AML475.D29", "AML556.D0", "AML556.D15", "AML556.D31", "AML707B.D0", "AML707B.D18", "AML707B.D41","AML707B.D97","AML707B.D113", "AML722B.D0", "AML722B.D49", "AML870.D0", "AML870.D14", "AML916.D0", "AML921A.D0", "AML997.D0", "AML997.D35","AML210A.D0","AML328.D0", "AML328.D29", "AML328.D113" , "AML328.D171", "AML329.D0", "AML329.D20", "AML329.D37","AML419A.D0","MUTZ3.fresh1", "MUTZ3.fresh2", "MUTZ3.frozen", "OCI.AML3")
 
-
+#Plot the mean gene expression across the samples, split by samples.
  p1<-metadata.filter %>% group_by(orig.ident) %>%
    summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor), FLT3 = unique(FLT3)) %>%
  ggplot(aes(x = factor(orig.ident, new_order), y = mean_mygene, fill = FLT3)) +
