@@ -1,0 +1,92 @@
+#230411,Nurefsan Sariipek
+#Check expression of genes of interest in data from single-cell AML paper (van Galen et al, Cell 2019)
+
+#Load the libraries
+
+library(tidyverse)
+library(Seurat)
+library(ggforce)
+library(ggplot2)
+library(cowplot)
+library(randomcoloR)
+library(readxl)
+library(data.table)
+library(janitor)
+
+#clean the enviroment
+rm(list=ls())
+
+# Frequently used function
+cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], collapse=d))
+
+# Load AML paper data. Make sure to run 1_Download_Seurat_AML.sh first and be in the right directory
+aml <- readRDS(file="/Users/dz855/Documents/R/AML2019/Seurat_AML.rds")
+
+#Add a variable to metadata to identify the FLT3 mutation across the samples
+aml$FLT3 <- case_when(grepl("210.", aml$orig.ident) | grepl("419.", aml$orig.ident) | grepl("329.", aml$orig.ident) | grepl("328.", aml$orig.ident)   ~ "FLT3_mutated_AML",
+                      grepl("1012.", aml$orig.ident) | grepl("314.", aml$orig.ident) | grepl("371.", aml$orig.ident) | grepl("420.", aml$orig.ident)  | grepl("475.", aml$orig.ident)| grepl("556.", aml$orig.ident) | grepl("707.", aml$orig.ident) | grepl("722.", aml$orig.ident) | grepl("870.", aml$orig.ident) | grepl("916.", aml$orig.ident) | grepl("921.", aml$orig.ident) | grepl("997.", aml$orig.ident) | grepl("MUTZ.", aml$orig.ident) | grepl("OCI.", aml$orig.ident)  ~ "FLT3_wildtype_AML",
+                      grepl("BM.", aml$orig.ident)   ~ "Normal")
+#turn into a factor 
+aml$FLT3 <- as.factor(aml@meta.data$FLT3)   
+
+# Add gene expression as metadata
+metadata <- as_tibble(aml@meta.data, rownames = "cell")
+
+#Select your gene of interest (One of these)
+mygene <- "HOXA9"
+mygene <- "HAVCR2"
+mygene <- "LGALS9"
+mygene <- "CEACAM1"
+mygene <- "HMGB1"
+
+metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
+
+# Filter out "normal" cells from AML patients since their gene expression may be aberrant and reorder the data to better visualitazion 
+metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
+  mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
+  mutate(Donor = factor(Donor, levels = c("Normal", "AML"))) %>% 
+  mutate(FLT3 = factor(FLT3, levels = c("Normal", "FLT3_wildtype_AML", "FLT3_mutated_AML")))
+
+#Create this variable to better visulization for upcoming plotting
+
+new_order <- c("BM1", "BM2", "BM3", "BM4", "BM5.34p", "BM5.34p38n", "AML1012.D0","AML314.D0", "AML314.D31", "AML371.D0", "AML371.D34", "AML420B.D0", "AML420B.D14", "AML420B.D35", "AML475.D0", "AML475.D29", "AML556.D0", "AML556.D15", "AML556.D31", "AML707B.D0", "AML707B.D18", "AML707B.D41","AML707B.D97","AML707B.D113", "AML722B.D0", "AML722B.D49", "AML870.D0", "AML870.D14", "AML916.D0", "AML921A.D0", "AML997.D0", "AML997.D35","AML210A.D0","AML328.D0", "AML328.D29", "AML328.D113" , "AML328.D171", "AML329.D0", "AML329.D20", "AML329.D37","AML419A.D0","MUTZ3.fresh1", "MUTZ3.fresh2", "MUTZ3.frozen", "OCI.AML3")
+
+
+ p1<-metadata.filter %>% group_by(orig.ident) %>%
+   summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor), FLT3 = unique(FLT3)) %>%
+ ggplot(aes(x = factor(orig.ident, new_order), y = mean_mygene, fill = FLT3)) +
+  ylab("Mean Normalized expression") + 
+geom_bar(stat="identity") +
+ggtitle(mygene) +
+theme_bw() +
+theme(aspect.ratio = 0.5, axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 10, color = "black"),
+axis.title.x = element_blank(),
+axis.text.y = element_text(size = 12),
+axis.title.y = element_text(size = 15, color = "black"),
+legend.title = element_text(size = 12),
+legend.text = element_text(size = 12),
+plot.title = element_text(size = 14, hjust = 0.5))
+
+#Visualize the plot
+p1
+
+
+  # Sina plot
+p2 <- metadata.filter %>%
+  ggplot(aes(x = factor(orig.ident, new_order), y = mygene, color = flt3)) +
+  geom_violin(scale = "width") +
+  geom_sina(scale = "width") +
+  ylab("Normalized expression") +
+  ggtitle(mygene) +
+  scale_x_discrete(drop = F) +
+  theme_bw() +
+  theme(aspect.ratio = 0.5,
+        axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 8, color = "black"),
+        axis.title.x = element_blank(),
+        axis.text.y = element_text(size = 12),
+        axis.title.y = element_text(size = 15, color = "black"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size = 14, hjust = 0.5))
+#Visualize the plot        
+p2   
