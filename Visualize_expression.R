@@ -16,6 +16,10 @@ cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], c
 # Load AML paper data. This first needs to be downloaded as described in README.md
 aml <- readRDS("Seurat_AML.rds")
 
+# Change MUTZ3 labels because the data for the different labels are similar
+aml$orig.ident <- gsub("MUTZ3.*", "MUTZ3", aml$orig.ident)
+aml$orig.ident <- factor(aml$orig.ident, levels = unique(aml$orig.ident))
+
 # Generate a metadata tibble and add gene expression (choose one gene)
 metadata <- as_tibble(aml@meta.data, rownames = "cell")
 mygene <- "HOXA9"
@@ -26,7 +30,7 @@ mygene <- "HMGB1"
 # The following has changes with Seurat version 5. Update if you get an error.
 metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
 
-# # Filter for AML cells at Dx or BM cells. Also remove "normal" cells from AML patients since their gene expression may be aberrant
+# Filter for AML cells at Dx or BM cells. Also remove "normal" cells from AML patients since their gene expression may be aberrant
 metadata.filter <- metadata %>% filter(grepl("AML.*D0", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
   mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
   mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
@@ -50,7 +54,7 @@ p1 <- metadata.filter %>% group_by(CellType) %>%
         plot.title = element_text(size = 14, hjust = 0.5))
 
 # Visualize the plot 
-plot(p1)  
+p1
                                        
 # The sina/violin plot shows expression in every individual cell (symbol)
 p2 <- metadata.filter %>%
@@ -72,7 +76,7 @@ p2 <- metadata.filter %>%
         plot.title = element_text(size = 14, hjust = 0.5))
                                        
 # Visualize the plot 
-plot(p2) 
+p2
                                        
 # Save pdf
 pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
