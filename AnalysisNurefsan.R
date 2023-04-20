@@ -18,7 +18,7 @@ rm(list=ls())
 # Frequently used function
 cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], collapse=d))
 
-# Load AML paper data. See 1_Download_Seurat_AML.sh first for how to obtain this file
+# Load AML paper data. See https://github.com/petervangalen/reanalyze-aml2019 first for how to obtain this file
 # For Nurefsan: setwd("/Users/dz855/Documents/R/AML2019/")
 # For Peter: setwd("~/DropboxMGB/GitHub/reanalyze-aml2019/")
 aml <- readRDS(file = "Seurat_AML.rds")
@@ -27,7 +27,7 @@ aml <- readRDS(file = "Seurat_AML.rds")
 aml$orig.ident <- gsub("MUTZ3.*", "MUTZ3", aml$orig.ident)
 aml$orig.ident <- factor(aml$orig.ident, levels = unique(aml$orig.ident))
 
-# Add a variable to metadata to identify the FLT3 mutation across the samples - DOUBLE CHECK THIS!!!
+# Add a variable to metadata to identify the FLT3 mutation across the samples
 normal <- c(paste0("BM", 1:4), "BM5.34p", "BM5.34p38n")
 flt3_mutated <- c("AML210A", "AML419A", "AML997", "AML329", "AML328")
 flt3_wt <- c("AML1012", "AML314", "AML371", "AML420B", "AML475", "AML556", "AML707B", "AML722B", "AML870", "AML916", "AML921A")
