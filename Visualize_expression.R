@@ -26,8 +26,8 @@ mygene <- "HMGB1"
 # The following has changes with Seurat version 5. Update if you get an error.
 metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
 
-# Filter out "normal" cells from AML patients since their gene expression may be aberrant
-metadata.filter <- metadata %>% filter(grepl("AML", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
+# # Filter for AML cells at Dx or BM cells. Also remove "normal" cells from AML patients since their gene expression may be aberrant
+metadata.filter <- metadata %>% filter(grepl("AML.*D0", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
   mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
   mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
 
