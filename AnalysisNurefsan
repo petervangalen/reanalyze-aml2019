@@ -23,9 +23,11 @@ cutf <- function(x, f=1, d="/") sapply(strsplit(x, d), function(i) paste(i[f], c
 aml <- readRDS(file="/Users/dz855/Documents/R/AML2019/Seurat_AML.rds")
 
 #Add a variable to metadata to identify the FLT3 mutation across the samples
-aml$FLT3 <- case_when(grepl("210.", aml$orig.ident) | grepl("419.", aml$orig.ident) | grepl("329.", aml$orig.ident) | grepl("328.", aml$orig.ident)   ~ "FLT3_mutated_AML",
-                      grepl("1012.", aml$orig.ident) | grepl("314.", aml$orig.ident) | grepl("371.", aml$orig.ident) | grepl("420.", aml$orig.ident)  | grepl("475.", aml$orig.ident)| grepl("556.", aml$orig.ident) | grepl("707.", aml$orig.ident) | grepl("722.", aml$orig.ident) | grepl("870.", aml$orig.ident) | grepl("916.", aml$orig.ident) | grepl("921.", aml$orig.ident) | grepl("997.", aml$orig.ident) | grepl("MUTZ.", aml$orig.ident) | grepl("OCI.", aml$orig.ident)  ~ "FLT3_wildtype_AML",
-                      grepl("BM.", aml$orig.ident)   ~ "Normal")
+aml$FLT3 <- case_when(grepl("210|419|329|328", aml$orig.ident) ~ "FLT3_mutated_AML"
+                      grepl("1012|314|371|420|475|556|707|722|870|916|921|997|MUTZ|OCI", aml$orig.ident) ~ "FLT3_wildtype_AML", 
+                      grepl("BM., aml$orig.ident) ~ "Normal")
+                      
+                      
 #turn into a factor 
 aml$FLT3 <- as.factor(aml@meta.data$FLT3)   
 
