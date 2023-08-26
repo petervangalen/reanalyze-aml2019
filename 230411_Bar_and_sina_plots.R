@@ -27,20 +27,30 @@ mygene <- "HAVCR2"
 mygene <- "LGALS9"
 mygene <- "CEACAM1"
 mygene <- "HMGB1"
+mygene <- "AKT1"
+mygene <- "AKT2"
+mygene <- "AKT3"
+mygene <- "MTOR"
+mygene <- "EIF4A1"
+mygene <- "EIF4A2"
+mygene <- "EIF4A3"
+mygene <- "EIF2S1"
+mygene <- "EIF2S2"
+mygene <- "EIF2S3"
 # The following has changes with Seurat version 5. Update if you get an error.
 metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
 
-# Filter for AML cells at Dx or BM cells. Also remove "normal" cells from AML patients since their gene expression may be aberrant
+# Filter for AML cells at Dx or BM cells. Also remove "healthy" cells from AML patients since their gene expression may be aberrant
 metadata.filter <- metadata %>% filter(grepl("AML.*D0", orig.ident) & grepl("-like", CellType) | grepl("BM", orig.ident)) %>%
-  mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Normal", no = "AML")) %>%
-  mutate(Donor = factor(Donor, levels = c("Normal", "AML")))
+  mutate(Donor = ifelse(grepl("BM", orig.ident), yes = "Healthy", no = "AML")) %>%
+  mutate(Donor = factor(Donor, levels = c("Healthy", "AML")))
 
 # The bar plot shows the mean expression across cell types in healthy donors (green) and malignant cells in AML patients at diagnossis (red)
 p1 <- metadata.filter %>% group_by(CellType) %>%
   summarize(n = n(), mean_mygene = mean(mygene), Donor = unique(Donor)) %>%
   ggplot(aes(x = CellType, y = mean_mygene, fill = Donor)) +
   geom_bar(stat="identity") +
-  scale_fill_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
+  scale_fill_manual(values = c(Healthy = "#66cdaa", AML = "#cd5c5c")) +
   ylab("Mean normalized expression") +
   ggtitle(mygene) +
   theme_bw() +
@@ -64,7 +74,7 @@ p2 <- metadata.filter %>%
   ylab("Normalized expression,log(TP10K+1)") +
   ggtitle(mygene) +
   scale_x_discrete(drop = F) +
-  scale_color_manual(values = c(Normal = "#66cdaa", AML = "#cd5c5c")) +
+  scale_color_manual(values = c(Healthy = "#66cdaa", AML = "#cd5c5c")) +
   theme_bw() +
   theme(aspect.ratio = 0.5,
         axis.text.x = element_text(angle = 45, vjust= 1, hjust = 1, size = 15, color = "black"),
