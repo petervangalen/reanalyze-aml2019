@@ -46,7 +46,7 @@ metadata_filter <- metadata_tib %>% filter(grepl("AML.*D0", orig.ident) & grepl(
 metadata_filter <- metadata_filter %>% arrange(Donor, CellType)
 
 
-# Create gene expression matrix -------------------------------------------------------------------
+# Filter by genes and cell types ------------------------------------------------------------------
 
 # Select genes to visualize & extract matrix with expression values
 genes <- c("AKT1", "AKT2", "AKT3", "MTOR",
@@ -61,47 +61,24 @@ genes <- c("AKT1", "AKT2", "AKT3", "MTOR",
            "EIF4H",
            "EIF5",
            "EIF5B")
-#genes <- c("EIF4A1", "EIF4A2", "EIF4A3", "AKT1", "MTOR")
 expr_mat <- as.matrix(LayerData(aml, layer = "scale.data"))[genes,]
 
 # Optional: subset for cell types
 metadata_filter <- metadata_filter %>% filter(CellType %in% c("HSC", "Prog", "GMP", "ProMono", "Mono", "cDC",
   "HSC-like", "Prog-like", "GMP-like", "ProMono-like", "Mono-like", "cDC-like"))
 
-# Subset expression matrix
+# Generate factors for heatmap annotation
+donor_fac <- metadata_filter$Donor
+donor_summary_fac <- metadata_filter %>% group_by(CellType, Donor) %>% summarize() %>% .$Donor
+
+
+# Create expression matrix and summary expression matrix ------------------------------------------
+
+# Subset expression matrix for Heatmap 1
 plot_mat <- expr_mat[,metadata_filter$cell]
 plot_mat[,1:3]
 
-# Define annotation objects
-top_anno.ha <- HeatmapAnnotation(CellType = metadata_filter$CellType,
-                                 Donor = metadata_filter$Donor,
-                                 col = list(CellType = cell_colors[unique(as.character(metadata_filter$CellType))]),
-                                 annotation_name_gp = gpar(fontsize = 10),
-                                 border = T)
-
-# Create Heatmap object
-hm <- Heatmap(plot_mat,
-              col = heat_colors[3:11],
-              cluster_rows = F,
-              cluster_columns = F,
-              row_names_gp = gpar(fontsize = 10),
-              show_column_names = F,
-              top_annotation = top_anno.ha,
-              name = "Expr",
-              column_title_gp = gpar(fontsize = 10),
-              border = T,
-              use_raster = T,
-              raster_quality = 10)
-
-pdf(paste0(genes[1], "-", genes[length(genes)], "_Heatmap.pdf"), width = 8, height = 5)
-print(hm)
-dev.off()
-
-
-
-# Summarize ---------------------------------------------------------------------------------------
-
-# Convert the matrix to a data table, add metadata (make sure it joins by "cell")
+# Create expression matrix for Heatmap 2. First, convert the matrix to a data table & add metadata (make sure it joins by "cell")
 plot_dt <- as.data.table(as.table(plot_mat))
 colnames(plot_dt) <- c("gene", "cell", "expr")
 plot_dt <- left_join(plot_dt, metadata_filter)
@@ -117,9 +94,38 @@ rownames(summarized_mat) <- unique(summarized_dt$gene)
 colnames(summarized_mat) <- unique(summarized_dt$CellType)
 summarized_mat[1:3,1:3]
 
-# Define annotation objects. Adjust as needed (or omit, and comment out the top_annotation below)
-donor_fac <- factor(c(rep("Healthy", 6), rep("AML", 6)), levels = c("Healthy", "AML"))
-top_anno.ha <- HeatmapAnnotation(Donor = donor_fac,
+# Heatmap 1 (every column is a cell) --------------------------------------------------------------
+
+# Define annotation objects
+top_anno.ha <- HeatmapAnnotation(CellType = metadata_filter$CellType,
+                                 Donor = donor_fac,
+                                 col = list(CellType = cell_colors[unique(as.character(metadata_filter$CellType))]),
+                                 annotation_name_gp = gpar(fontsize = 10),
+                                 border = T)
+
+# Create Heatmap object
+hm1 <- Heatmap(plot_mat,
+               col = heat_colors[3:11],
+               cluster_rows = F,
+               cluster_columns = F,
+               row_names_gp = gpar(fontsize = 10),
+               show_column_names = F,
+               top_annotation = top_anno.ha,
+               name = "Expr",
+               column_title_gp = gpar(fontsize = 10),
+               border = T,
+               use_raster = T,
+               raster_quality = 10)
+
+pdf(paste0(genes[1], "-", genes[length(genes)], "_Heatmap.pdf"), width = 8, height = 5)
+print(hm1)
+dev.off()
+
+
+# Heatmap 2 (every column is a cell type) ---------------------------------------------------------
+
+# Define annotation objects
+top_anno.ha <- HeatmapAnnotation(Donor = donor_summary_fac,
                                  annotation_name_gp = gpar(fontsize = 10),
                                  border = T)
 
@@ -129,23 +135,20 @@ ordered_genes <- names(sort(rowMeans(summarized_mat[,7:9]), decreasing =  T))
 summarized_mat <- summarized_mat[ordered_genes,]
 
 # Create Heatmap object
-hm <- Heatmap(summarized_mat,
-              col = heat_colors,
-              cluster_rows = F,
-              cluster_columns = F,
-              row_names_gp = gpar(fontsize = 10),
-              show_column_names = T,
-              column_split = donor_fac,
-              top_annotation = top_anno.ha,
-              name = "Expr",
-              column_title_gp = gpar(fontsize = 10),
-              border = T)
+hm2 <- Heatmap(summarized_mat,
+               col = heat_colors,
+               cluster_rows = F,
+               cluster_columns = F,
+               row_names_gp = gpar(fontsize = 10),
+               show_column_names = T,
+               column_split = donor_summary_fac,
+               top_annotation = top_anno.ha,
+               name = "Expr",
+               column_title_gp = gpar(fontsize = 10),
+               border = T)
 
-pdf(paste0(genes[1], "-", genes[length(genes)], "_SummaryHeatmap.pdf"), width = 8, height = 5)
-print(hm)
+pdf(paste0(genes[1], "-", genes[length(genes)], "_SummaryHeatmap.pdf"), width = 6, height = 6)
+print(hm2)
 dev.off()
 
-
-# Split AML samples by the presence/absence of signaling mutations
-#signaling_mutations
 
