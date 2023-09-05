@@ -22,7 +22,8 @@ You can also split the analysis by donors or any other variable in `aml@meta.dat
 
 ### Heatmaps
 
-Use the script `230824_Heatmaps.R` to visualize expression of several genes at once. This script generates heatmaps showing expression of genes (rows) in every cell (columns), or summary heatmaps showing average expression of genes (rows) in cell types (columns).
+Use the script `230824_Heatmaps.R` to visualize expression of several genes at once. This script generates heatmaps showing expression of genes (rows) in every cell (columns), or summary heatmaps showing average expression of genes (rows) in cell types (columns). For example:
 
+![alt text](/images/translation_factors.png "Translation initiation")
 
 **Other resources:** With the original publication, the raw data was deposited on GEO (accession [GSE116256](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE116256)); you don't need the raw data for the analysis described here. The original code for cell type classification etc. by Volker Hovestadt is found on the Bernstein lab [aml2019](https://github.com/BernsteinLab/aml2019) repository. 
