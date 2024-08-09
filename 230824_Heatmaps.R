@@ -9,6 +9,8 @@ library(janitor)
 library(data.table)
 library(ComplexHeatmap)
 
+setwd("~/DropboxMGB/GitHub/reanalyze-aml2019/")
+
 # Start with a clean slate
 rm(list=ls())
 
@@ -49,13 +51,13 @@ metadata_filter <- metadata_filter %>% arrange(Donor, CellType)
 # Filter by genes and cell types ------------------------------------------------------------------
 
 # Select genes to visualize & extract matrix with expression values
-genes <- c("AKT1", "AKT2", "AKT3", "MTOR",
-           "EIF1", "EIF1AX", "EIF1AY",
+genes <- c("EIF4A1", "EIF4A2","EIF4E", "EIF4G1") # Together, EIF4F
+genes <- c("EIF1", "EIF1AX", "EIF1AY",
            "EIF2S1", "EIF2S2", "EIF2S3",
            "EIF3A", "EIF3B", "EIF3C", "EIF3D", "EIF3E", "EIF3F", "EIF3G", "EIF3H", "EIF3I", "EIF3J", "EIF3K", "EIF3CL",
-           "EIF4A1", "EIF4A2", "EIF4A3",       #
-           "EIF4E", "EIF4E1B", "EIF4EBP1",     # Together, EIF4F
-           "EIF4G1", "EIF4G2", "EIF4G3",       #
+           "EIF4A1", "EIF4A2", "EIF4A3",
+           "EIF4E", "EIF4E1B", "EIF4EBP1",
+           "EIF4G1", "EIF4G2", "EIF4G3",
            "DDX3X",
            "EIF4B",
            "EIF4H",
@@ -66,6 +68,7 @@ expr_mat <- as.matrix(LayerData(aml, layer = "scale.data"))[genes,]
 # Optional: subset for cell types
 metadata_filter <- metadata_filter %>% filter(CellType %in% c("HSC", "Prog", "GMP", "ProMono", "Mono", "cDC",
   "HSC-like", "Prog-like", "GMP-like", "ProMono-like", "Mono-like", "cDC-like"))
+metadata_filter <- metadata_filter %>% filter(CellType %in% c("HSC", "Prog", "GMP", "HSC-like", "Prog-like", "GMP-like"))
 
 # Generate factors for heatmap annotation
 donor_fac <- metadata_filter$Donor
