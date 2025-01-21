@@ -46,6 +46,7 @@ mygene <- "SRSF2"
 mygene <- "JAK2"
 mygene <- "GAPDH"
 mygene <- "CD200"
+mygene <- "BCOR"
 # The following has changed with Seurat version 5. Update if you get an error.
 metadata$mygene <- LayerData(aml, layer = "data")[mygene,]
 
@@ -93,7 +94,7 @@ p2 <- metadata.filter %>%
         legend.title = element_text(size = 12),
         legend.text = element_text(size = 12),
         plot.title = element_text(size = 14, hjust = 0.5))
-                                       
+
 # Visualize the plot 
 p2
                                        
