@@ -103,6 +103,16 @@ pdf(paste0(mygene, "_plots.pdf"), width = 9, height= 9)
 plot_grid(p1, p2, ncol = 1)
 dev.off()
 
+# Note: you cannot back-calculate the number of transcripts per 10K based on the mean because the mean of log-transformed values differs from the log of the mean. Example for GAPDH:
+cells.seu <- subset(aml, CellType == "HSC")
+cells.id <- colnames(cells.seu)[grepl("BM", colnames(cells.seu))]
+counts.mat <- LayerData(subset(aml, cells = cells.id), layer = "counts")
+norm_counts <- sweep(counts.mat, 2, colSums(counts.mat), FUN = "/") * 10000
+mean(norm_counts["GAPDH",])
+mean( log1p(norm_counts["GAPDH",]) )
+# For HSC, there are 3.43 GAPDH transcripts per 10K transcripts, and the mean normalized value is 1.0
+# For Mono, there are 10 GAPDH transcripts per 10K transcripts, and the mean normalized value is 2.0
+# For T, there are 1.71 GAPDH transcripts per 10K transcripts, and the mean normalized value is 0.46
 
 # Plot signature ----------------------------------------------------------------------------------
 
