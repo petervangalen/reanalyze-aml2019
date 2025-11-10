@@ -4,9 +4,9 @@ This repository contains scripts to reanalyze the single-cell RNA-seq data on AM
 
 ### Set up
 
-First, you need to [clone or download](https://www.freecodecamp.org/news/10-important-git-commands-that-every-developer-should-know/) this repository to your local disk. Then, you need to download the gene expression data to its top level folder (it is too large to share on Github). The gene expression data is saved as a Seurat object (Seurat_AML.rds). To save this, navigate to this folder in the terminal, and run the following command:
+First, you need to [clone or download](https://www.freecodecamp.org/news/10-important-git-commands-that-every-developer-should-know/) this repository to your local disk. Then, you need to download the gene expression data to its top level folder (it is too large to share on Github). The gene expression data is saved as a Seurat object (Seurat_AML.rds), which is available from Figshare:
 
-`wget https://www.dropbox.com/s/399x045zc57fiut/Seurat_AML.rds`
+[https://doi.org/10.6084/m9.figshare.30581066.v1](https://doi.org/10.6084/m9.figshare.30581066.v1)
 
 
 ### Bar and sina plots
