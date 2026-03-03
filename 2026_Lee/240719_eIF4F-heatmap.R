@@ -1,27 +1,22 @@
-# Peter van Galen, 240719
-# Create heatmap of translation initiation factors from single-cell AML paper (van Galen, Hovestadt et al, Cell 2019) for Supplemental Figure 1
+# Peter van Galen, 260303
+# Create heatmap of translation initiation factors for Supplemental Figure 1 of Lee et al, Blood Neoplasia, 2026.
+# Gene expression data is from AML single-cell analysis (van Galen, Hovestadt et al, Cell 2019).
 
 # Load required libraries
 library(tidyverse)
 library(Seurat)
 library(readxl)
-library(janitor)
 library(data.table)
 library(ComplexHeatmap)
 
 # Set working directory
-# fmt: skip
-setwd("~/Library/CloudStorage/OneDrive-MassGeneralBrigham/Github/reanalyze-aml2019/2024_Lee")
-# VM
-setwd("/home/unix/vangalen/reanalyze-aml2019/2024_Lee")
+repo_root <- system("git rev-parse --show-toplevel", intern = T)
+setwd(paste0(repo_root, "/2026_Lee"))
 
-# Start with a clean slate
+# Clear environment
 rm(list = ls())
 
-# Functions & colors
-cutf <- function(x, f = 1, d = "/") {
-  sapply(strsplit(x, d), function(i) paste(i[f], collapse = d))
-}
+# Load colors
 popcol_tib <- read_excel("../Single-cell_AML_colors.xlsx")
 cell_colors <- popcol_tib$mycol
 names(cell_colors) <- popcol_tib$pop
@@ -30,6 +25,7 @@ heat_colors <- read_excel(
   sheet = 2,
   col_names = "heat"
 )$heat
+
 
 # Load AML paper data -----------------------------------------------------------------------------
 

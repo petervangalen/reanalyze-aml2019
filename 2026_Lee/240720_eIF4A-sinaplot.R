@@ -1,5 +1,6 @@
-# Peter van Galen, 240720
-# Generate plots for translation initation factor genes from the single-cell AML data
+# Peter van Galen, 260303
+# Generate sina plots of translation initation factor for Figure 1A of Lee et al, Blood Neoplasia, 2026.
+# of the single-cell AML data
 
 # Load required libraries
 library(tidyverse)
@@ -10,16 +11,9 @@ library(ggforce)
 # Start with a clean slate
 rm(list = ls())
 
-# Frequently used function
-cutf <- function(x, f = 1, d = "/") {
-  sapply(strsplit(x, d), function(i) paste(i[f], collapse = d))
-}
-
 # Set working directory
-# fmt: skip
-setwd("~/Library/CloudStorage/OneDrive-MassGeneralBrigham/Github/reanalyze-aml2019/2024_Lee")
-# VM
-setwd("/home/unix/vangalen/reanalyze-aml2019/2024_Lee")
+repo_root <- system("git rev-parse --show-toplevel", intern = T)
+setwd(paste0(repo_root, "/2026_Lee"))
 
 # Load AML paper data. This first needs to be downloaded as described in README.md
 aml <- readRDS("../Seurat_AML.rds")
@@ -146,6 +140,8 @@ GMP_Pvals[c("EIF4A1", "EIF4A2", "EIF4E", "EIF4G1"), ]
 
 # Merge violins to simplify figure (250927) -----------------------------------
 
+# This figure is not actually used in the paper
+
 # Calculate P-values for all genes, then extract EIF4A1
 HSPC_Pvals <- FindMarkers(
   aml,
@@ -214,5 +210,3 @@ metadata.filter %>%
   )
 
 ggsave("240720_eIF4A-sinaplot-merge.pdf", height = 5, width = 5)
-
-# This last figure is not actually used in the paper

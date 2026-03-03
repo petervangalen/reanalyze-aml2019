@@ -28,6 +28,6 @@ Use the script `230824_Heatmaps.R` to visualize expression of several genes at o
 
 Folders contain scripts to reproduce specific published visualizations:
 * 2024_Talvard-Balland → Talvard-Balland _et al._, J Clin Invest, 2024. [PMID: 38916965](https://pubmed.ncbi.nlm.nih.gov/38916965/)
-* 2024_Lee → Lee _et al_., bioRxiv, 2024. [doi: https://doi.org/10.1101/2024.12.20.629809](https://doi.org/10.1101/2024.12.20.629809)
+* 2026_Lee → Lee _et al_., Blood Neoplasia, 2026. [doi: https://doi.org/10.1016/j.bneo.2026.100202](https://doi.org/10.1016/j.bneo.2026.100202)
 
 **Other resources:** With the original publication, the raw data was deposited on GEO (accession [GSE116256](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE116256)); you don't need the raw data for the analysis described here. The original code for cell type classification etc. by Volker Hovestadt is found on the Bernstein lab [aml2019](https://github.com/BernsteinLab/aml2019) repository. 
